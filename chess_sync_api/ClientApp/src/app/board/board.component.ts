@@ -18,6 +18,7 @@ export class BoardComponent implements OnInit {
   blockInCheck: BlockInfo;
   gameEndResult: Teams | 'draw' = 'black';
   partnerRequested = false;
+  isRemoteApp = false;
   constructor(
     private ruleSet: DefaultRuleSet,
     private syncConnection: SyncConnection) {
@@ -27,6 +28,7 @@ export class BoardComponent implements OnInit {
   ngOnInit(): void {
     this.syncConnection.initBoard.subscribe((onTop: Teams) => {
       this.resetGameState(onTop === 'white');
+      this.isRemoteApp = true;
     });
     this.syncConnection.move.subscribe(({ from, to, promptTo }: { from: PositionOnBoard, to: PositionOnBoard, promptTo?: PieceType }) => {
       console.log(from, to, promptTo);
@@ -38,7 +40,6 @@ export class BoardComponent implements OnInit {
     });
   }
   resetGameState(whiteOnTop?: boolean) {
-    this.partnerRequested = false;
     const boardInfo = this.ruleSet.createNewBoard(whiteOnTop);
     this.resetComponent(boardInfo);
   }
@@ -50,6 +51,8 @@ export class BoardComponent implements OnInit {
     this.promotableTo = undefined;
     this.blockInCheck = undefined;
     this.gameEndResult = undefined;
+    this.partnerRequested = false;
+    this.isRemoteApp = false;
   }
 
   startRemoteGame() {
@@ -57,7 +60,7 @@ export class BoardComponent implements OnInit {
   }
   suggestOrMove(block: BlockInfo) {
     if (!(this.suggestingFor && this.tryToMove(block))) {
-      if (block.piece && block.piece.team === this.boardInfo.teamAtBottom) {
+      if (!this.isRemoteApp || (block.piece && block.piece.team === this.boardInfo.teamAtBottom)) {
         this.suggest(block);
       }
     }
@@ -98,7 +101,7 @@ export class BoardComponent implements OnInit {
         promptForBlock.piece = a;
         this.promotableTo = undefined;
         this.afterMove(this.boardInfo);
-        if (!isSyncMove) {
+        if (!isSyncMove && this.isRemoteApp) {
           this.syncConnection.syncMove(move.from, move.to, a.type);
         }
       };
@@ -107,7 +110,7 @@ export class BoardComponent implements OnInit {
       }
     } else {
       this.afterMove(this.boardInfo);
-      if (!isSyncMove) {
+      if (!isSyncMove && this.isRemoteApp) {
         this.syncConnection.syncMove(move.from, move.to);
       }
     }
@@ -124,17 +127,23 @@ export class BoardComponent implements OnInit {
     if (this.blockInCheck) {
       if (!allPossibleMoves.length) {
         this.gameEndResult = boardInfo.lastMoveOfTeam;
-        this.syncConnection.gameEnded();
+        if (this.isRemoteApp) {
+          this.syncConnection.gameEnded();
+        }
       }
     } else {
       if (!allPossibleMoves.length) {
         this.gameEndResult = 'draw';
-        this.syncConnection.gameEnded();
+        if (this.isRemoteApp) {
+          this.syncConnection.gameEnded();
+        }
       }
       const teamMates = boardInfo.getBlocksOfTeam(boardInfo.nextMoveOfTeam);
       if (teamMates.length === 2 && teamMates.some(a => a.piece.type === 'camel')) {
         this.gameEndResult = 'draw';
-        this.syncConnection.gameEnded();
+        if (this.isRemoteApp) {
+          this.syncConnection.gameEnded();
+        }
       }
     }
   }
