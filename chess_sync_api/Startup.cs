@@ -29,7 +29,7 @@ namespace chess_sync_api
             services.AddSignalR();
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "ClientApp/dist";
+                configuration.RootPath = "ClientApp/dist/chess";
             });
         }
 
