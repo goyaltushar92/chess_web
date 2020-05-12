@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { BlockInfo } from '../block-info/block-info';
-import { DefaultRuleSet, BoardInfo } from '../rule-set/rule-set.service';
-import { Move, Piece, Teams, PositionOnBoard, PieceType } from './pieces/base-piece';
+import { DefaultRuleSet } from '../rule-set/default-rule-set';
+import { BoardInfo } from '../rule-set/board-info';
+import { Piece, Teams, PieceType } from './pieces/base-piece';
+import { PositionOnBoard } from "../block-info/position-on-board";
+import { Move } from "./moves/move";
 import { SyncConnection } from '../peer-sync/peer-sync.service';
 // import { PeerSyncConnection } from '../peer-sync/peer-sync.service';
 @Component({
@@ -59,6 +62,7 @@ export class BoardComponent implements OnInit {
     this.syncConnection.requestPartner().then(() => this.partnerRequested = true);
   }
   suggestOrMove(block: BlockInfo) {
+
     if (!(this.suggestingFor && this.tryToMove(block))) {
       if (!this.isRemoteApp || (block.piece && block.piece.team === this.boardInfo.teamAtBottom)) {
         this.suggest(block);

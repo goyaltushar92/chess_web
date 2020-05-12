@@ -1,0 +1,58 @@
+@mixin pieceBefore($top) {
+    content: "";
+    position: absolute;
+    top: $top;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-position: center;
+}
+
+@mixin piece($team, $piece, $extraHeight) {
+    :host[team=#{"" + $team}][piece=#{$piece}] {
+        position: relative;
+        display: block;
+        &:before {
+            background-image: url('/assets/pieces_3d_basic/#{$team}-#{$piece}.png');
+            color: $team;
+            pointer-events: none;
+            @include pieceBefore($extraHeight);
+        }
+    }
+}
+
+@mixin pieceFlipped($team, $piece, $extraHeight) {
+    :host.flipped[team=#{"" + $team}][piece=#{$piece}] {
+        position: relative;
+        display: block;
+        &:before {
+            background-image: url('/assets/pieces_3d_basic/#{$team}-#{$piece}-flipped.png');
+            color: $team;
+            @include pieceBefore($extraHeight);
+        }
+    }
+}
+
+@mixin team($team, $extraHeight) {
+    @include piece($team,elephant, $extraHeight);
+    @include piece($team,horse, $extraHeight);
+    @include pieceFlipped($team,horse, $extraHeight);
+    @include piece($team,camel, $extraHeight);
+    @include pieceFlipped($team,camel, $extraHeight);
+    @include piece($team,king, $extraHeight);
+    @include piece($team,queen, $extraHeight);
+    @include piece($team,pyada, $extraHeight);
+}
+
+:host {
+    display: block;
+    position: absolute;
+    height: 12.5%;
+    width: 12.5%;
+    top: 50px;
+    left: 50px;
+}
+
+@include team(black, -25%);
+@include team(white, -25%);

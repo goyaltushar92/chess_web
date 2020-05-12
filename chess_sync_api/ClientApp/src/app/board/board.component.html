@@ -1,15 +1,27 @@
-<div class="board" *ngIf="!!boardInfo">
-    <div class="board-row" *ngFor="let row of boardInfo; index as ri">
-        <app-block [class.checked]="cell === blockInCheck" [class.target]="isBlockInSuggestedTargets(cell)"
-            [class.touched]="suggestingFor === cell" (click)="suggestOrMove(cell)"
-            [class.flipped]="!!cell.piece && cell.piece.team === boardInfo.teamAtTop" [style.zIndex]="ri"
-            title="({{ri}},{{ci}})" [rowIndex]="ri" [columnIndex]="ci" [piece]="cell.piece"
-            *ngFor="let cell of row; index as ci"></app-block>
+<audio src="../../assets/bounce.mp3" #audioEl style="display: none;"></audio>
+<div class="board-wrap">
+    <div class="center board" *ngIf="!!boardInfo">
+        <div class="board-row" *ngFor="let row of boardInfo; index as ri">
+            <app-block [class.checked]="cell === blockInCheck" [class.target]="isBlockInSuggestedTargets(cell)"
+                [class.touched]="suggestingFor === cell" (click)="suggestOrMove(cell)" title="({{ri}},{{ci}})"
+                [rowIndex]="ri" [columnIndex]="ci" [piece]="cell.piece" *ngFor="let cell of row; index as ci"
+                [style.--row-index]="ri" [style.--col-index]="ci">
+            </app-block>
+        </div>
+    </div>
+    <div class="center piece-layer-wrap" *ngIf="!!boardInfo && !!boardInfo.pieces">
+        <app-piece *ngFor="let piece of boardInfo.pieces" [attr.team]="piece.team" [attr.piece]="piece.type"
+            (transitionend)="audioEl.play()" [class.flipped]="piece && piece.team === boardInfo.teamAtTop"
+            [style.zIndex]="piece.block?.rowIndex + 1" [style.--row-index]="piece.block?.rowIndex"
+            [style.--col-index]="piece.block?.columnIndex">
+        </app-piece>
     </div>
 </div>
-<div class="prompt-wrap" *ngIf="!!promotableTo">
+<div class=" prompt-wrap" *ngIf="!!promotableTo">
     <div class="prompt">
-        <app-block (click)="onPromptSelection(piece)" [piece]="piece" *ngFor="let piece of promotableTo"></app-block>
+        <app-block (click)="onPromptSelection(piece)" [piece]="piece" *ngFor="let piece of promotableTo">
+
+        </app-block>
     </div>
 </div>
 <div class="prompt-wrap" *ngIf="!!gameEndResult || !boardInfo">

@@ -2,8 +2,8 @@
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
 WORKDIR /app
-EXPOSE 8080
-ENV ASPNETCORE_URLS=http://*:8080
+EXPOSE 80
+EXPOSE 433
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS buildbase
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
@@ -28,4 +28,4 @@ RUN dotnet publish "chess_sync_api.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["sudo", "dotnet", "chess_sync_api.dll"]
+ENTRYPOINT ["dotnet", "chess_sync_api.dll"]

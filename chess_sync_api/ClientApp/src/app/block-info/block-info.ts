@@ -1,5 +1,7 @@
-import { PositionOnBoard, Piece, Move } from '../board/pieces/base-piece';
-import { BoardInfo } from '../rule-set/rule-set.service';
+import { Piece } from '../board/pieces/base-piece';
+import { PositionOnBoard } from "./position-on-board";
+import { Move } from "../board/moves/move";
+import { BoardInfo } from "../rule-set/board-info";
 
 export class BlockInfo implements PositionOnBoard {
     rowIndex: number;
@@ -22,5 +24,14 @@ export class BlockInfo implements PositionOnBoard {
             return false;
         }
         return block.piece.team === this.piece.team;
+    }
+    clone() {
+        const newBlock = new BlockInfo();
+        newBlock.rowIndex = this.rowIndex;
+        newBlock.columnIndex = this.columnIndex;
+        if (this.piece) {
+            newBlock.piece = this.piece.clone(newBlock);
+        }
+        return newBlock;
     }
 }

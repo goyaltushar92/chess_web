@@ -1,4 +1,5 @@
-import { PositionOnBoard, PieceType } from '../board/pieces/base-piece';
+import { PieceType } from '../board/pieces/base-piece';
+import { PositionOnBoard } from "../block-info/position-on-board";
 
 import { Injectable, EventEmitter } from '@angular/core';
 import * as signalR from '@microsoft/signalr';

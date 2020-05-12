@@ -1,66 +1,26 @@
-@mixin pieceBefore($top) {
-    content: "";
-    position: absolute;
-    top: $top;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-size: cover;
-    background-position: center;
-}
 
 
-@mixin piece($team, $piece, $extraHeight) {
-    .piece[team=#{"" + $team}][piece=#{$piece}] {
-        position: relative;
-        display: block;
-        &:before {
-            background-image: url('/assets/pieces_3d_basic/#{$team}-#{$piece}.png');
-            color: $team;
-            pointer-events: none;
-            @include pieceBefore($extraHeight);
-        }
-    }
-}
-@mixin pieceFlipped($team, $piece, $extraHeight) {
-    .piece.flipped[team=#{"" + $team}][piece=#{$piece}] {
-        position: relative;
-        display: block;
-        &:before {
-            background-image: url('/assets/pieces_3d_basic/#{$team}-#{$piece}-flipped.png');
-            color: $team;
-            @include pieceBefore($extraHeight);
-        }
-    }
-}
-@mixin team($team, $extraHeight) {
-    @include piece($team,elephant, $extraHeight);
-    @include piece($team,horse, $extraHeight);
-    @include pieceFlipped($team,horse, $extraHeight);
-    @include piece($team,camel, $extraHeight);
-    @include pieceFlipped($team,camel, $extraHeight);
-    @include piece($team,king, $extraHeight);
-    @include piece($team,queen, $extraHeight);
-    @include piece($team,pyada, $extraHeight);
-}
 
-
-:host {
-    .board {
-        display: flex;
-        flex-direction: column;
-        --side: min(100vh, 100vw);
-        --padding: 50px;
+:host .board-wrap {
+    position: relative;
+    --side: min(100vh, 100vw);
+    --padding: 50px;
+    --border-width: 10px;
+    .center {
         height: calc(var(--side) - var(--padding) * 2);
         width: calc(var(--side) - var(--padding) * 2);
         padding: var(--padding);
         margin: auto;
+    }
+    .board {
+        display: flex;
+        flex-direction: column;
         .board-row {
             flex: 1;
             display: flex;
             flex-direction: row;
-            border-left: 10px rgba(black, 0.8) solid;
-            border-right: 10px rgba(black, 0.8) solid;
+            border-left: var(--border-width) rgba(black, 0.8) solid;
+            border-right: var(--border-width) rgba(black, 0.8) solid;
             &:nth-child(odd) {
                 app-block {
                     &:nth-child(odd) {
@@ -89,6 +49,7 @@
                 &.target {
                     position: relative;
                     display: block;
+                    z-index: var(--row-index);
                     &:after {
                         content: "";
                         position: absolute;
@@ -107,17 +68,34 @@
                 }
             }
             &:first-child {
-                border-top: 10px rgba(black, 0.8) solid;;
+                border-top: var(--border-width) rgba(black, 0.8) solid;;
             }
             &:last-child {
-                border-bottom: 10px rgba(black, 0.8) solid;
+                border-bottom: var(--border-width) rgba(black, 0.8) solid;
             }
         }
-        @include team(black, -25%);
-        @include team(white, -25%);
     }
-    
+    .piece-layer-wrap {
+        position: absolute;
+        top:0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        --padding: 60px;
+        pointer-events: none;
+        app-piece {
+            position: absolute;
+            top: 60px;
+            left: 60px;
+            --piece-side: calc(calc(var(--side) - var(--padding) * 2)/8);
+            width: var(--piece-side);
+            transform: translate(calc(var(--piece-side) * var(--col-index, 0)), calc(var(--piece-side) * calc(var(--row-index, 0) - 0.15) )); 
+            transition: transform 1s;
+        }
+    }
 }
+
+
 
 :host .prompt-wrap {
     position: absolute;
@@ -142,8 +120,6 @@
             border: 1px solid black;
             cursor: pointer;
         }
-        @include team(black, 0);
-        @include team(white, 0);
     }
 }
 .game-ended {
